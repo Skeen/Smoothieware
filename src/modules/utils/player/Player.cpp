@@ -42,7 +42,9 @@
 #define before_resume_gcode_checksum      CHECKSUM("before_resume_gcode")
 #define leave_heaters_on_suspend_checksum CHECKSUM("leave_heaters_on_suspend")
 
+#ifndef NO_SDCARD
 extern SDFAT mounter;
+#endif
 
 Player::Player()
 {
@@ -99,11 +101,14 @@ void Player::on_gcode_received(void *argument)
     Gcode *gcode = static_cast<Gcode *>(argument);
     string args = get_arguments(gcode->get_command());
     if (gcode->has_m) {
+#ifndef NO_SDCARD
         if (gcode->m == 21) { // Dummy code; makes Octoprint happy -- supposed to initialize SD card
             mounter.remount();
             gcode->stream->printf("SD card ok\r\n");
 
-        } else if (gcode->m == 23) { // select file
+        } else
+#endif
+        if (gcode->m == 23) { // select file
             this->filename = "/sd/" + args; // filename is whatever is in args
             this->current_stream = &(StreamOutput::NullStream);
 

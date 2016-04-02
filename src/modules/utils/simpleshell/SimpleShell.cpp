@@ -77,7 +77,9 @@ const SimpleShell::ptentry_t SimpleShell::commands_table[] = {
     {"net",      SimpleShell::net_command},
     {"load",     SimpleShell::load_command},
     {"save",     SimpleShell::save_command},
+#ifndef NO_SDCARD
     {"remount",  SimpleShell::remount_command},
+#endif
     {"calc_thermistor", SimpleShell::calc_thermistor_command},
     {"thermistors", SimpleShell::print_thermistors_command},
     {"md5sum",   SimpleShell::md5sum_command},
@@ -320,7 +322,7 @@ void SimpleShell::ls_command( string parameters, StreamOutput *stream )
         stream->printf("Could not open directory %s\r\n", path.c_str());
     }
 }
-
+#ifndef NO_SDCARD
 extern SDFAT mounter;
 
 void SimpleShell::remount_command( string parameters, StreamOutput *stream )
@@ -328,6 +330,7 @@ void SimpleShell::remount_command( string parameters, StreamOutput *stream )
     mounter.remount();
     stream->printf("remounted\r\n");
 }
+#endif
 
 // Delete a file
 void SimpleShell::rm_command( string parameters, StreamOutput *stream )
@@ -933,7 +936,9 @@ void SimpleShell::help_command( string parameters, StreamOutput *stream )
     stream->printf("cat file [limit] [-d 10]\r\n");
     stream->printf("rm file\r\n");
     stream->printf("mv file newfile\r\n");
+#ifndef NO_SDCARD
     stream->printf("remount\r\n");
+#endif
     stream->printf("play file [-v]\r\n");
     stream->printf("progress - shows progress of current play\r\n");
     stream->printf("abort - abort currently playing file\r\n");

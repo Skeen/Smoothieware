@@ -67,9 +67,14 @@
 
 
 // USB Stuff
+#ifndef NO_SDCARD
 SDCard sd  __attribute__ ((section ("AHBSRAM0"))) (P0_9, P0_8, P0_7, P0_6);      // this selects SPI1 as the sdcard as it is on Smoothieboard
 //SDCard sd(P0_18, P0_17, P0_15, P0_16);  // this selects SPI0 as the sdcard
 //SDCard sd(P0_18, P0_17, P0_15, P2_8);  // this selects SPI0 as the sdcard witrh a different sd select
+#else
+    // No SDCARD, NO MSD
+    #define DISABLEMSD
+#endif
 
 USB u __attribute__ ((section ("AHBSRAM0")));
 USBSerial usbserial __attribute__ ((section ("AHBSRAM0"))) (&u);
@@ -79,7 +84,9 @@ USBMSD msc __attribute__ ((section ("AHBSRAM0"))) (&u, &sd);
 USBMSD *msc= NULL;
 #endif
 
+#ifndef NO_SDCARD
 SDFAT mounter __attribute__ ((section ("AHBSRAM0"))) ("sd", &sd);
+#endif
 
 GPIO leds[5] = {
     GPIO(P1_18),
@@ -113,13 +120,20 @@ void init() {
     Version version;
     kernel->streams->printf("  Build version %s, Build date %s\r\n", version.get_build(), version.get_build_date());
 
-    bool sdok= (sd.disk_initialize() == 0);
-    if(!sdok) kernel->streams->printf("SDCard failed to initialize\r\n");
+    #ifndef NO_SDCARD
+        bool sdok= (sd.disk_initialize() == 0);
+        if(!sdok) kernel->streams->printf("SDCard failed to initialize\r\n");
+    #else
+        bool sdok = false;
+        kernel->streams->printf("SDCARD is disabled\r\n");
+    #endif
 
     #ifdef NONETWORK
         kernel->streams->printf("NETWORK is disabled\r\n");
     #endif
 
+// TODO: Clean this up
+#ifndef NO_SDCARD
 #ifdef DISABLEMSD
     // attempt to be able to disable msd in config
     if(sdok && !kernel->config->value( disable_msd_checksum )->by_default(false)->as_bool()){
@@ -132,6 +146,10 @@ void init() {
         msc= NULL;
         kernel->streams->printf("MSD is disabled\r\n");
     }
+#endif
+#else
+    msc= NULL;
+    kernel->streams->printf("MSD is disabled\r\n");
 #endif
 
 
