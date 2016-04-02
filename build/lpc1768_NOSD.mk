@@ -14,21 +14,9 @@
 # -----------------------------------------------------------------------------
 # LPC1768 device specific makefile.
 # -----------------------------------------------------------------------------
-ifndef BUILD_DIR
-$(error makefile must set BUILD_DIR.)
-endif
 
-
-# Set build customizations for this device.
-DEVICE=LPC1768
-ARCHITECTURE=armv7-m
-DEVICE_FLAGS=-mcpu=cortex-m3 -mthumb
-DEVICE_CFLAGS=$(DEVICE_FLAGS) -mthumb-interwork
-NO_FLOAT_SCANF?=0
-NO_FLOAT_PRINTF?=0
-DEFINES+=-D__LPC17XX__
+# This version disables SD card, i.e. for direct flashing
 DEFINES+=-DNO_SDCARD
 LSCRIPT=$(MBED_DIR)/$(DEVICE)/GCC_ARM/$(DEVICE)_NOSD.ld
 
-# Now include the rest which is generic across devices.
-include $(BUILD_DIR)/common.mk
+include $(BUILD_DIR)/lpc1768.mk
