@@ -17,6 +17,6 @@
 
 # This version disables SD card, i.e. for direct flashing
 DEFINES+=-DNO_SDCARD
-LSCRIPT=$(MBED_DIR)/$(DEVICE)/GCC_ARM/$(DEVICE)_NOSD.ld
+LSCRIPT=$(BUILD_DIR)/../mbed/src/vendor/NXP/cmsis/LPC1768/GCC_ARM/LPC1768_NOSD.ld
 
 include $(BUILD_DIR)/lpc1768.mk
