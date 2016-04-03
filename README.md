@@ -15,7 +15,7 @@ To build the 'No SD card' target, run;
 DEVICES=lpc1768_NOSD make -j8 all
 ```
 
-To flash (using lpc21isp), run;
+To flash (using [lpc21isp](http://sourceforge.net/projects/lpc21isp/)), run;
 ```bash
 DEVICES=lpc1768_NOSD CONSOLE=/dev/ttyUSB0 make flash
 ```
@@ -31,6 +31,6 @@ Before flashing the chip must enter Serial Bootloader mode, to enter this mode;
 # Smoothieware
 Smoothie is a free, opensource, high performance G-code interpreter and CNC controller written in Object-Oriented C++ for the LPC17xx micro-controller ( ARM Cortex M3 architecture ). It will run on a mBed, a LPCXpresso, a SmoothieBoard, R2C2 or any other LPC17xx-based board. The motion control part is a port of the awesome grbl.
 
-Documentation can be found here : [[http://smoothieware.org/]]
+Documentation can be found here : http://smoothieware.org/
 
 For information about Smoothieware itself, head over to [Smoothieware/Smoothieware](https://github.com/Smoothieware/Smoothieware)
