@@ -24,6 +24,7 @@ using std::string;
 #include "PublicDataRequest.h"
 #include "PublicData.h"
 #include "arm_solutions/BaseSolution.h"
+#include "arm_solutions/BipolarSolution.h"
 #include "arm_solutions/CartesianSolution.h"
 #include "arm_solutions/RotatableCartesianSolution.h"
 #include "arm_solutions/LinearDeltaSolution.h"
@@ -55,6 +56,7 @@ using std::string;
 
 // arm solutions
 #define  arm_solution_checksum               CHECKSUM("arm_solution")
+#define  bipolar_checksum                    CHECKSUM("bipolar")
 #define  cartesian_checksum                  CHECKSUM("cartesian")
 #define  rotatable_cartesian_checksum        CHECKSUM("rotatable_cartesian")
 #define  rostock_checksum                    CHECKSUM("rostock")
@@ -168,6 +170,9 @@ void Robot::load_config()
 
     } else if(solution_checksum == morgan_checksum) {
         this->arm_solution = new MorganSCARASolution(THEKERNEL->config);
+
+    } else if(solution_checksum == bipolar_checksum) {
+        this->arm_solution = new BipolarSolution(THEKERNEL->config);
 
     } else if(solution_checksum == cartesian_checksum) {
         this->arm_solution = new CartesianSolution(THEKERNEL->config);
