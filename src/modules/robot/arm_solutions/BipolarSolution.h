@@ -7,34 +7,53 @@
 
 #include "libs/Config.h"
 
+#include <math.h>
+
+template<typename floating>
 struct Coord2D
 {
-    Coord2D(float x, float y)
+    Coord2D(floating x, floating y)
         : x(x), y(y)
     {
     }
 
-    float x;
-    float y;
+    floating x;
+    floating y;
 };
 
-class BipolarSolution : public BaseSolution {
-    public:
-        BipolarSolution(){};
-        BipolarSolution(Config*);
-        void cartesian_to_actuator( const float millimeters[], ActuatorCoordinates &steps ) override;
-        void actuator_to_cartesian( const ActuatorCoordinates &steps, float millimeters[] ) override;
+class BipolarSolution : public BaseSolution
+{
+public:
+    BipolarSolution(){};
+    BipolarSolution(Config*);
+    void cartesian_to_actuator( const float millimeters[], ActuatorCoordinates &steps ) override;
+    void actuator_to_cartesian( const ActuatorCoordinates &steps, float millimeters[] ) override;
 
     // Convert between degrees and radians
-    float to_degrees(float radians);
-    float to_radians(float degrees);
+    template<typename floating>
+    floating to_degrees(floating radians)
+    {
+        return radians * (floating(180) / M_PI);
+    }
+
+    template<typename floating>
+    floating to_radians(floating degrees)
+    {
+        return degrees * (M_PI / floating(180));
+    }
 
     /**
      * Convert polar coordinates
      * into cartesian coordinates.
      * All angles are measured in RADIANS
      */
-    Coord2D polar2cartesian(float theta, float r);
+    template<typename floating>
+    Coord2D<floating> polar2cartesian(floating theta, floating r)
+    {
+        floating x = r * cos(theta);
+        floating y = r * sin(theta);
+        return Coord2D<floating>(x,y);
+    }
 
     /*
      * Convert a set of bipolar coordinates
@@ -42,23 +61,52 @@ class BipolarSolution : public BaseSolution {
      * Whereas polar coordinates are represented by an angle and a distance,
      * bipolar coordinates are represented by two angles. 
      */
-    Coord2D bipolar2cartesian(float theta1, float theta2);
+    template<typename floating>
+    Coord2D<floating> bipolar2cartesian(floating theta1, floating theta2)
+    {
+        floating theta = ((M_PI - theta2)/2) - theta1;
+        floating r = 2 * arm_length * sin(theta2/2);
+        return polar2cartesian(theta,r);
+    }
 
     /*
      * Convert a set of cartesian coordinatesS
      * into polar coordinates
      */
-    Coord2D cartesian2polar(float x, float y);
+    template<typename floating>
+    Coord2D<floating> cartesian2polar(floating x, floating y)
+    {
+        floating r = sqrt(x*x + y*y);
+        floating theta = atan2(y,x);
+        return Coord2D<floating>(theta,r);
+    }
 
     /*
      * Convert a set of cartesian coordinates (X,Y)
      * into bipolar coordinates (Theta_1,Theta_2) represented by two angles,
      * the angle of the platter and the angle of the arm.
      */
-    Coord2D cartesian2bipolar(float x, float y);
+    template<typename floating>
+    Coord2D<floating> cartesian2bipolar(floating x, floating y)
+    {
+        floating theta2 = 2 * asin( sqrt(x*x + y*y) / (2*arm_length) );
+        floating theta1 = (M_PI-theta2)/2 - atan2(y,x);
+
+        return Coord2D<floating>(theta1, theta2);
+        /*
+        auto choord = cartesian2polar(x,y);
+
+        float theta = choord.x;
+        float r = choord.y;
+
+        float th1 = acos( r / (2* arm_length) ) - theta;
+        float th2 = 2 * asin( r / (2* arm_length) );
+        return Coord2D(th1,th2);
+        */
+    }
 
     private:
-        float arm_length;
+        long double arm_length;
 };
 
 #endif
