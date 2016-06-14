@@ -6,7 +6,7 @@ DEVICES=lpc1768
 #  Checked - Optimizations enabled with MRI debug monitor support. (Recommended Type)
 #  Release - Optimizations enabled.
 #  Debug - Optimization disabled with MRI debug monitor support.
-BUILD_TYPE=Checked
+BUILD_TYPE=Release
 
 # Set to 1 to tag each heap allocation with the caller's return address.
 # NOTE: Can't be enabled with latest build as not compatible with newlib nano.
@@ -94,7 +94,7 @@ export DISABLEMSD = 1
 include $(BUILD_DIR)/build.mk
 
 CONSOLE?=/dev/arduino
-BAUD?=1000000
+BAUD?=230400
 
 .PHONY: debug-store flash upload debug console dfu combined
 
@@ -107,7 +107,7 @@ debug-store: ../LPC1768/$(PROJECT).elf
 combined: ../LPC1768/$(PROJECT)-combined.hex
 
 flash: ../LPC1768/$(PROJECT)-combined.hex debug-store
-	lpc21isp -wipe $< $(CONSOLE) 115200 12000
+	lpc21isp -wipe $< $(CONSOLE) $(BAUD) 12000
 
 dfu: ../LPC1768/$(PROJECT).bin
 	dfu-util -D $< -R

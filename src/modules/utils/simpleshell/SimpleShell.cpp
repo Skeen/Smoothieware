@@ -77,7 +77,7 @@ const SimpleShell::ptentry_t SimpleShell::commands_table[] = {
     {"net",      SimpleShell::net_command},
     {"load",     SimpleShell::load_command},
     {"save",     SimpleShell::save_command},
-    {"remount",  SimpleShell::remount_command},
+    //{"remount",  SimpleShell::remount_command},
     {"calc_thermistor", SimpleShell::calc_thermistor_command},
     {"thermistors", SimpleShell::print_thermistors_command},
     {"md5sum",   SimpleShell::md5sum_command},
@@ -308,7 +308,7 @@ void SimpleShell::ls_command( string parameters, StreamOutput *stream )
         stream->printf("Could not open directory %s\r\n", path.c_str());
     }
 }
-
+/*
 extern SDFAT mounter;
 
 void SimpleShell::remount_command( string parameters, StreamOutput *stream )
@@ -316,6 +316,7 @@ void SimpleShell::remount_command( string parameters, StreamOutput *stream )
     mounter.remount();
     stream->printf("remounted\r\n");
 }
+*/
 
 // Delete a file
 void SimpleShell::rm_command( string parameters, StreamOutput *stream )
