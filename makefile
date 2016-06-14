@@ -17,6 +17,9 @@ $(DIRSCLEAN): %.clean:
 debug-store:
 	@ $(MAKE) -C src debug-store
 
+combined:
+	@ $(MAKE) -C src combined
+
 flash:
 	@ $(MAKE) -C src flash
 
@@ -32,4 +35,4 @@ debug:
 console:
 	@ $(MAKE) -C src console
 
-.PHONY: all $(DIRS) $(DIRSCLEAN) debug-store flash upload debug console dfu
+.PHONY: all $(DIRS) $(DIRSCLEAN) debug-store flash upload debug console dfu combined

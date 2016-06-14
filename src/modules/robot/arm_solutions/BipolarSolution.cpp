@@ -21,6 +21,7 @@ void BipolarSolution::cartesian_to_actuator( const float cartesian_mm[], Actuato
     auto thetas = cartesian2bipolar((long double) cartesian_mm[X_AXIS], (long double) cartesian_mm[Y_AXIS]);
 
     auto theta1_deg = to_degrees(thetas.x);
+    /*
     if(abs(theta1_deg - actuator_mm[ALPHA_STEPPER]) > 180)
     {
         if(theta1_deg > 0)
@@ -28,6 +29,7 @@ void BipolarSolution::cartesian_to_actuator( const float cartesian_mm[], Actuato
         else
             theta1_deg += 360;
     }
+    */
 
     actuator_mm[ALPHA_STEPPER] = theta1_deg;
     actuator_mm[BETA_STEPPER ] = to_degrees(thetas.y);

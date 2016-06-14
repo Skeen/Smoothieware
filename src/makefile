@@ -70,22 +70,41 @@ else
 export EXCLUDED_MODULES = $(EXCLUDE_MODULES)
 endif
 
+export EXCLUDE_MODULES = tools/drillingcycles tools/filamentdetector tools/laser tools/rotarydeltacalibration tools/scaracal tools/spindle tools/switch tools/zprobe utils/motordrivercontrol utils/panel
+
+# included modules
+# tools:
+#endstops
+#extruder
+#temperaturecontrol
+#temperatureswitch
+#toolmanager 
+# utils:
+#configurator
+#currentcontrol
+#killbutton
+#player
+#PlayLed
+#simpleshell
 
 # set to not compile in any network support
-#export NONETWORK = 1
+export NONETWORK = 1
+export DISABLEMSD = 1
 
 include $(BUILD_DIR)/build.mk
 
 CONSOLE?=/dev/arduino
 BAUD?=1000000
 
-.PHONY: debug-store flash upload debug console dfu
+.PHONY: debug-store flash upload debug console dfu combined
 
 debug-store: ../LPC1768/$(PROJECT).elf
 	cp ../LPC1768/$(PROJECT).elf ../LPC1768/$(PROJECT)_lastupload.elf
 
 ../LPC1768/$(PROJECT)-combined.hex: ../LPC1768/$(PROJECT).hex 
 	srec_cat ../bootloader/DFU-Bootloader.hex -Intel $< -Intel -out ../LPC1768/main-combined.hex -Intel
+
+combined: ../LPC1768/$(PROJECT)-combined.hex
 
 flash: ../LPC1768/$(PROJECT)-combined.hex debug-store
 	lpc21isp -wipe $< $(CONSOLE) 115200 12000
