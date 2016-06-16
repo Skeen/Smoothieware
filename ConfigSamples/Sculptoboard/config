@@ -37,21 +37,21 @@ y_axis_max_speed                             30000            # mm/min
 z_axis_max_speed                             300              # mm/min
 
 # Stepper module pins ( ports, and pin numbers, appending "!" to the number will invert a pin )
-alpha_step_pin                               1.18              # Pin for alpha stepper step signal
-alpha_dir_pin                                1.19              # Pin for alpha stepper direction
-alpha_en_pin                                 1.20              # Pin for alpha enable pin
+alpha_step_pin                               1.19              # Pin for alpha stepper step signal
+alpha_dir_pin                                1.20              # Pin for alpha stepper direction
+alpha_en_pin                                 1.18              # Pin for alpha enable pin
 alpha_current                                1.5              # X stepper motor current
 alpha_max_rate                               1500.0          # mm/min
 
-beta_step_pin                                1.24              # Pin for beta stepper step signal
-beta_dir_pin                                 1.25             # Pin for beta stepper direction
-beta_en_pin                                  1.26             # Pin for beta enable
+beta_step_pin                                1.25              # Pin for beta stepper step signal
+beta_dir_pin                                 1.26             # Pin for beta stepper direction
+beta_en_pin                                  1.24             # Pin for beta enable
 beta_current                                 1.5              # Y stepper motor current
 beta_max_rate                                1500.0          # mm/min
 
-gamma_step_pin                               1.27              # Pin for gamma stepper step signal
-gamma_dir_pin                                1.28             # Pin for gamma stepper direction
-gamma_en_pin                                 1.29             # Pin for gamma enable
+gamma_step_pin                               1.28              # Pin for gamma stepper step signal
+gamma_dir_pin                                1.29             # Pin for gamma stepper direction
+gamma_en_pin                                 1.27             # Pin for gamma enable
 gamma_current                                1.5              # Z stepper motor current
 gamma_max_rate                               300.0            # mm/min
 
@@ -81,9 +81,9 @@ extruder.hotend.default_feed_rate               600              # Default rate 
 extruder.hotend.acceleration                    500              # Acceleration for the stepper motor mm/sec²
 extruder.hotend.max_speed                       50               # mm/s
 
-extruder.hotend.step_pin                        1.21              # Pin for extruder step signal
-extruder.hotend.dir_pin                         1.22             # Pin for extruder dir signal
-extruder.hotend.en_pin                          1.23             # Pin for extruder enable signal
+extruder.hotend.step_pin                        1.22              # Pin for extruder step signal
+extruder.hotend.dir_pin                         1.23             # Pin for extruder dir signal
+extruder.hotend.en_pin                          1.21             # Pin for extruder enable signal
 
 # extruder offset
 #extruder.hotend.x_offset                        0                # x offset from origin in mm
