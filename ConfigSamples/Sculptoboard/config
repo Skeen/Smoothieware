@@ -5,14 +5,14 @@ default_seek_rate                            600             # Default rate ( mm
 mm_per_arc_segment                           0.5              # Arcs are cut into segments ( lines ), this is the length for
                                                               # these segments.  Smaller values mean more resolution,
                                                               # higher values mean faster computation
-mm_per_line_segment                          0.1              # Lines can be cut into segments ( not usefull with cartesian
+#mm_per_line_segment                          0.1              # Lines can be cut into segments ( not usefull with cartesian
                                                               # coordinates robots ).
 
 # Arm solution configuration : Cartesian robot. Translates mm positions into stepper positions
-arm_solution                                 bipolar     # selects the delta arm solution
-alpha_steps_per_mm                           10               # Steps per mm for alpha stepper
-beta_steps_per_mm                            10               # Steps per mm for beta stepper
-gamma_steps_per_mm                           8             # Steps per mm for gamma stepper
+#arm_solution                                 bipolar     # selects the delta arm solution
+alpha_steps_per_mm                           31.1111111111  # (200*16*3.5)/360  # Steps per mm for alpha stepper
+beta_steps_per_mm                            40             # (200*16*4.5)/360  # Steps per mm for beta stepper
+gamma_steps_per_mm                           3200           # Steps per mm for gamma stepper
 
 # Planner module configuration : Look-ahead and acceleration configuration
 planner_queue_size                           32               # DO NOT CHANGE THIS UNLESS YOU KNOW EXACTLY WHAT YOU ARE DOING
@@ -37,20 +37,20 @@ y_axis_max_speed                             30000            # mm/min
 z_axis_max_speed                             300              # mm/min
 
 # Stepper module pins ( ports, and pin numbers, appending "!" to the number will invert a pin )
-alpha_step_pin                               1.19              # Pin for alpha stepper step signal
-alpha_dir_pin                                1.20              # Pin for alpha stepper direction
-alpha_en_pin                                 1.18              # Pin for alpha enable pin
+alpha_step_pin                               1.25              # Pin for alpha stepper step signal
+alpha_dir_pin                                1.26              # Pin for alpha stepper direction
+alpha_en_pin                                 1.24              # Pin for alpha enable pin
 alpha_current                                1.5              # X stepper motor current
 alpha_max_rate                               1500.0          # mm/min
 
-beta_step_pin                                1.25              # Pin for beta stepper step signal
-beta_dir_pin                                 1.26             # Pin for beta stepper direction
-beta_en_pin                                  1.24             # Pin for beta enable
+beta_step_pin                                1.19              # Pin for beta stepper step signal
+beta_dir_pin                                 1.20!             # Pin for beta stepper direction
+beta_en_pin                                  1.18             # Pin for beta enable
 beta_current                                 1.5              # Y stepper motor current
 beta_max_rate                                1500.0          # mm/min
 
 gamma_step_pin                               1.28              # Pin for gamma stepper step signal
-gamma_dir_pin                                1.29             # Pin for gamma stepper direction
+gamma_dir_pin                                1.29!             # Pin for gamma stepper direction
 gamma_en_pin                                 1.27             # Pin for gamma enable
 gamma_current                                1.5              # Z stepper motor current
 gamma_max_rate                               300.0            # mm/min
@@ -76,12 +76,12 @@ currentcontrol_module_enable                 false             #
 
 ## Extruder module configuration
 extruder.hotend.enable                          true             # Whether to activate the extruder module at all. All configuration is ignored if false
-extruder.hotend.steps_per_mm                    140              # Steps per mm for extruder stepper
+extruder.hotend.steps_per_mm                    155              # Steps per mm for extruder stepper
 extruder.hotend.default_feed_rate               600              # Default rate ( mm/minute ) for moves where only the extruder moves
 extruder.hotend.acceleration                    500              # Acceleration for the stepper motor mm/sec²
 extruder.hotend.max_speed                       50               # mm/s
 
-extruder.hotend.step_pin                        1.22              # Pin for extruder step signal
+extruder.hotend.step_pin                        1.22             # Pin for extruder step signal
 extruder.hotend.dir_pin                         1.23             # Pin for extruder dir signal
 extruder.hotend.en_pin                          1.21             # Pin for extruder enable signal
 
@@ -135,7 +135,7 @@ temperature_control.hotend.enable            true             # Whether to activ
                                                               # All configuration is ignored if false.
 temperature_control.hotend.thermistor_pin    0.23             # Pin for the thermistor to read
 temperature_control.hotend.heater_pin        2.5              # Pin that controls the heater, set to nc if a readonly thermistor is being defined
-temperature_control.hotend.thermistor        EPCOS100K        # see http://smoothieware.org/temperaturecontrol#toc5
+temperature_control.hotend.thermistor        Semitec        # see http://smoothieware.org/temperaturecontrol#toc5
 #temperature_control.hotend.beta             4066             # or set the beta value
 temperature_control.hotend.set_m_code        104              #
 temperature_control.hotend.set_and_wait_m_code 109            #
@@ -170,7 +170,7 @@ temperature_control.hotend.designator        T                #
 temperature_control.bed.enable               false             #
 temperature_control.bed.thermistor_pin       0.24             #
 temperature_control.bed.heater_pin           2.5              #
-temperature_control.bed.thermistor           Honeywell100K    # see http://smoothieware.org/temperaturecontrol#toc5
+temperature_control.bed.thermistor           Semitec    # see http://smoothieware.org/temperaturecontrol#toc5
 #temperature_control.bed.beta                3974             # or set the beta value
 
 temperature_control.bed.set_m_code           140              #
@@ -213,13 +213,13 @@ switch.misc.output_type                      digital          # just an on or of
 endstops_enable                              true             # the endstop module is enabled by default and can be disabled here
 #corexy_homing                               false            # set to true if homing on a hbot or corexy
 alpha_min_endstop                            nc               # add a ! to invert if endstop is NO connected to ground
-alpha_max_endstop                            3.25             # NOTE set to nc if this is not installed
-alpha_homing_direction                       home_to_max      # or set to home_to_max and set alpha_max
+alpha_max_endstop                            nc               # NOTE set to nc if this is not installed
+alpha_homing_direction                       home_to_min      # or set to home_to_max and set alpha_max
 alpha_min                                    0                # this gets loaded after homing when home_to_min is set
 alpha_max                                    200              # this gets loaded after homing when home_to_max is set
 beta_min_endstop                             nc               #
-beta_max_endstop                             nc               #
-beta_homing_direction                        home_to_min      #
+beta_max_endstop                             3.25             #
+beta_homing_direction                        home_to_max      #
 beta_min                                     0                #
 beta_max                                     200              #
 gamma_min_endstop                            3.26             #
