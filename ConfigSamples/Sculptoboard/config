@@ -219,7 +219,7 @@ alpha_homing_direction                       home_to_min      # or set to home_t
 alpha_min                                    0                # this gets loaded after homing when home_to_min is set
 alpha_max                                    200              # this gets loaded after homing when home_to_max is set
 beta_min_endstop                             nc               #
-beta_max_endstop                             3.25             #
+beta_max_endstop                             3.25!             #
 beta_homing_direction                        home_to_max      #
 beta_min                                     0                #
 beta_max                                     200              #
