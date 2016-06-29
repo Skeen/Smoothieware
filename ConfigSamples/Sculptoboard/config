@@ -45,7 +45,7 @@ alpha_current                                1.5              # X stepper motor 
 alpha_max_rate                               1500.0          # mm/min
 
 beta_step_pin                                1.28              # Pin for beta stepper step signal
-beta_dir_pin                                 1.27             # Pin for beta stepper direction
+beta_dir_pin                                 1.27!             # Pin for beta stepper direction
 beta_en_pin                                  1.29             # Pin for beta enable
 beta_current                                 1.5              # Y stepper motor current
 beta_max_rate                                1500.0          # mm/min
