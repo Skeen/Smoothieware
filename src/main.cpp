@@ -85,7 +85,7 @@ USBMSD *msc= NULL;
 
 SDFAT mounter __attribute__ ((section ("AHBSRAM0"))) ("sd", &sd);
 */
-
+/*
 GPIO leds[5] = {
     GPIO(P1_18),
     GPIO(P1_19),
@@ -93,6 +93,7 @@ GPIO leds[5] = {
     GPIO(P1_21),
     GPIO(P4_28)
 };
+*/
 
 // debug pins, only used if defined in src/makefile
 #ifdef STEPTICKER_DEBUG_PIN
@@ -102,10 +103,12 @@ GPIO stepticker_debug_pin(STEPTICKER_DEBUG_PIN);
 void init() {
 
     // Default pins to low status
+    /*
     for (int i = 0; i < 5; i++){
         leds[i].output();
         leds[i]= 0;
     }
+    */
 
 #ifdef STEPTICKER_DEBUG_PIN
     stepticker_debug_pin.output();
@@ -245,11 +248,13 @@ void init() {
     // clear up the config cache to save some memory
     kernel->config->config_cache_clear();
 
+    /*
     if(kernel->is_using_leds()) {
         // set some leds to indicate status... led0 init done, led1 mainloop running, led2 idle loop running, led3 sdcard ok
         leds[0]= 1; // indicate we are done with init
         //leds[3]= sdok?1:0; // 4th led indicates sdcard is available (TODO maye should indicate config was found)
     }
+    */
 /*
     if(sdok) {
         // load config override file if present
@@ -278,13 +283,15 @@ int main()
 {
     init();
 
-    uint16_t cnt= 0;
+    //uint16_t cnt= 0;
     // Main loop
     while(1){
+        /*
         if(THEKERNEL->is_using_leds()) {
             // flash led 2 to show we are alive
             leds[1]= (cnt++ & 0x1000) ? 1 : 0;
         }
+        */
         THEKERNEL->call_event(ON_MAIN_LOOP);
         THEKERNEL->call_event(ON_IDLE);
     }

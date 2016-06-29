@@ -5,14 +5,14 @@ default_seek_rate                            600             # Default rate ( mm
 mm_per_arc_segment                           0.5              # Arcs are cut into segments ( lines ), this is the length for
                                                               # these segments.  Smaller values mean more resolution,
                                                               # higher values mean faster computation
-mm_per_line_segment                          0.1              # Lines can be cut into segments ( not usefull with cartesian
+#mm_per_line_segment                          0.1              # Lines can be cut into segments ( not usefull with cartesian
                                                               # coordinates robots ).
 
 # Arm solution configuration : Cartesian robot. Translates mm positions into stepper positions
-arm_solution                                 bipolar     # selects the delta arm solution
-alpha_steps_per_mm                           10               # Steps per mm for alpha stepper
-beta_steps_per_mm                            10               # Steps per mm for beta stepper
-gamma_steps_per_mm                           8             # Steps per mm for gamma stepper
+#arm_solution                                 bipolar     # selects the delta arm solution
+alpha_steps_per_mm                           31.1111111111  # (200*16*3.5)/360  # Steps per mm for alpha stepper
+beta_steps_per_mm                            40             # (200*16*4.5)/360  # Steps per mm for beta stepper
+gamma_steps_per_mm                           3200           # Steps per mm for gamma stepper
 
 # Planner module configuration : Look-ahead and acceleration configuration
 planner_queue_size                           32               # DO NOT CHANGE THIS UNLESS YOU KNOW EXACTLY WHAT YOU ARE DOING
@@ -37,6 +37,7 @@ y_axis_max_speed                             30000            # mm/min
 z_axis_max_speed                             300              # mm/min
 
 # Stepper module pins ( ports, and pin numbers, appending "!" to the number will invert a pin )
+
 alpha_step_pin                               1.22              # Pin for alpha stepper step signal
 alpha_dir_pin                                1.21              # Pin for alpha stepper direction
 alpha_en_pin                                 1.23              # Pin for alpha enable pin
@@ -76,7 +77,7 @@ currentcontrol_module_enable                 false             #
 
 ## Extruder module configuration
 extruder.hotend.enable                          true             # Whether to activate the extruder module at all. All configuration is ignored if false
-extruder.hotend.steps_per_mm                    140              # Steps per mm for extruder stepper
+extruder.hotend.steps_per_mm                    155              # Steps per mm for extruder stepper
 extruder.hotend.default_feed_rate               600              # Default rate ( mm/minute ) for moves where only the extruder moves
 extruder.hotend.acceleration                    500              # Acceleration for the stepper motor mm/sec²
 extruder.hotend.max_speed                       50               # mm/s
@@ -135,7 +136,7 @@ temperature_control.hotend.enable            true             # Whether to activ
                                                               # All configuration is ignored if false.
 temperature_control.hotend.thermistor_pin    0.23             # Pin for the thermistor to read
 temperature_control.hotend.heater_pin        2.5              # Pin that controls the heater, set to nc if a readonly thermistor is being defined
-temperature_control.hotend.thermistor        EPCOS100K        # see http://smoothieware.org/temperaturecontrol#toc5
+temperature_control.hotend.thermistor        Semitec        # see http://smoothieware.org/temperaturecontrol#toc5
 #temperature_control.hotend.beta             4066             # or set the beta value
 temperature_control.hotend.set_m_code        104              #
 temperature_control.hotend.set_and_wait_m_code 109            #
@@ -170,7 +171,7 @@ temperature_control.hotend.designator        T                #
 temperature_control.bed.enable               false             #
 temperature_control.bed.thermistor_pin       0.24             #
 temperature_control.bed.heater_pin           2.5              #
-temperature_control.bed.thermistor           Honeywell100K    # see http://smoothieware.org/temperaturecontrol#toc5
+temperature_control.bed.thermistor           Semitec    # see http://smoothieware.org/temperaturecontrol#toc5
 #temperature_control.bed.beta                3974             # or set the beta value
 
 temperature_control.bed.set_m_code           140              #

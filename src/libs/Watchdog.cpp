@@ -44,6 +44,7 @@ void Watchdog::on_idle(void*)
 // TODO handle when MRI is disabled
 extern "C" void WDT_IRQHandler(void)
 {
+    /*
     if(THEKERNEL->is_using_leds()) {
         // set led pattern to show we are in watchdog timeout
         leds[0]= 0;
@@ -51,6 +52,7 @@ extern "C" void WDT_IRQHandler(void)
         leds[2]= 0;
         leds[3]= 1;
     }
+    */
 
     WDT_ClrTimeOutFlag(); // bootloader uses this flag to enter DFU mode
     WDT_Feed();
