@@ -5,11 +5,11 @@ default_seek_rate                            600             # Default rate ( mm
 mm_per_arc_segment                           0.5              # Arcs are cut into segments ( lines ), this is the length for
                                                               # these segments.  Smaller values mean more resolution,
                                                               # higher values mean faster computation
-mm_per_line_segment                          0.1              # Lines can be cut into segments ( not usefull with cartesian
+#mm_per_line_segment                          0.1              # Lines can be cut into segments ( not usefull with cartesian
                                                               # coordinates robots ).
 
 # Arm solution configuration : Cartesian robot. Translates mm positions into stepper positions
-arm_solution                                 bipolar     # selects the delta arm solution
+#arm_solution                                 bipolar     # selects the delta arm solution
 alpha_steps_per_mm                           10               # Steps per mm for alpha stepper
 beta_steps_per_mm                            10               # Steps per mm for beta stepper
 gamma_steps_per_mm                           8             # Steps per mm for gamma stepper
@@ -37,20 +37,20 @@ y_axis_max_speed                             30000            # mm/min
 z_axis_max_speed                             300              # mm/min
 
 # Stepper module pins ( ports, and pin numbers, appending "!" to the number will invert a pin )
-alpha_step_pin                               2.7              # Pin for alpha stepper step signal
-alpha_dir_pin                                2.8              # Pin for alpha stepper direction
+alpha_step_pin                               2.8              # Pin for alpha stepper step signal
+alpha_dir_pin                                2.7              # Pin for alpha stepper direction
 alpha_en_pin                                 0.4              # Pin for alpha enable pin
 alpha_current                                1.5              # X stepper motor current
 alpha_max_rate                               1500.0          # mm/min
 
-beta_step_pin                                2.11              # Pin for beta stepper step signal
-beta_dir_pin                                 2.12             # Pin for beta stepper direction
+beta_step_pin                                2.6              # Pin for beta stepper step signal
+beta_dir_pin                                 2.5             # Pin for beta stepper direction
 beta_en_pin                                  0.10             # Pin for beta enable
 beta_current                                 1.5              # Y stepper motor current
 beta_max_rate                                1500.0          # mm/min
 
-gamma_step_pin                               0.28              # Pin for gamma stepper step signal
-gamma_dir_pin                                2.13             # Pin for gamma stepper direction
+gamma_step_pin                               2.4              # Pin for gamma stepper step signal
+gamma_dir_pin                                2.3             # Pin for gamma stepper direction
 gamma_en_pin                                 0.19             # Pin for gamma enable
 gamma_current                                1.5              # Z stepper motor current
 gamma_max_rate                               300.0            # mm/min
@@ -182,7 +182,7 @@ temperature_control.bed.designator           B                #
                                                               # when using bang bang
 
 ## Switch module for fan control
-switch.fan.enable                            true             #
+switch.fan.enable                            false             #
 switch.fan.input_on_command                  M106             #
 switch.fan.input_off_command                 M107             #
 switch.fan.output_pin                        2.6              #
