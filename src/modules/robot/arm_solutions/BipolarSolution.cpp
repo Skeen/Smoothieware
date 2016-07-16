@@ -10,6 +10,9 @@
 #include "libs/StreamOutput.h"
 #include "StreamOutputPool.h"
 
+#include <cmath>
+#include <cfloat>
+
 #define arm_length_checksum          CHECKSUM("arm_length")
 
 BipolarSolution::BipolarSolution(Config* config)
@@ -35,17 +38,36 @@ void BipolarSolution::cartesian_to_actuator( const float cartesian_mm[], Actuato
         auto thetas = cartesian2bipolar((long double) cartesian_mm[X_AXIS], (long double) cartesian_mm[Y_AXIS]);
 
         auto theta1_deg = to_degrees(thetas.x);
+        auto theta2_deg = to_degrees(thetas.y);
+
+        if(std::fpclassify(theta1_deg) != FP_NORMAL) {
+            THEKERNEL->streams->printf("WAT");
+        }
+        if(std::fpclassify(to_degrees(thetas.y)) != FP_NORMAL) {
+            THEKERNEL->streams->printf("WAT");
+        }
+        /*
+        if(theta1_deg < 1)
+        {
+            theta1_deg = 1;
+        }
+        if(theta2_deg < 1)
+        {
+            theta2_deg = 1;
+        }
+        */
+
+        /*
         if(fabs(theta1_deg - actuator_mm[ALPHA_STEPPER]) > 180)
         {
-            THEKERNEL->streams->printf("INSIDE LOOP!");
             if(theta1_deg > 0)
                 theta1_deg -= 360;
             else
                 theta1_deg += 360;
         }
-
+        */
         actuator_mm[ALPHA_STEPPER] = theta1_deg;
-        actuator_mm[BETA_STEPPER ] = to_degrees(thetas.y);
+        actuator_mm[BETA_STEPPER ] = theta2_deg;
         actuator_mm[GAMMA_STEPPER] = cartesian_mm[Z_AXIS];
     }
 }
