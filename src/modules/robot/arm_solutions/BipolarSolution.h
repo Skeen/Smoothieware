@@ -105,8 +105,12 @@ public:
         */
     }
 
+    bool set_optional(const arm_options_t& options) override;
+    bool get_optional(arm_options_t& options, bool force_all) override;
+
     private:
         long double arm_length;
+        bool raw_mode;
 };
 
 #endif
