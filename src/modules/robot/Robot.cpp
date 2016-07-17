@@ -227,7 +227,14 @@ void Robot::load_config()
     // initialise actuator positions to current cartesian position (X0 Y0 Z0)
     // so the first move can be correct if homing is not performed
     ActuatorCoordinates actuator_pos;
-    arm_solution->cartesian_to_actuator_extended(last_milestone, actuator_pos, actuator_pos);
+    ActuatorCoordinates current_pos{
+        actuators[X_AXIS]->get_current_position(),
+        actuators[Y_AXIS]->get_current_position(),
+        actuators[Z_AXIS]->get_current_position()
+    };
+
+
+    arm_solution->cartesian_to_actuator_extended(last_milestone, actuator_pos, current_pos);
     for (size_t i = 0; i < n_motors; i++)
         actuators[i]->change_last_milestone(actuator_pos[i]);
 
@@ -359,6 +366,12 @@ void Robot::on_gcode_received(void *argument)
 
     enum MOTION_MODE_T motion_mode= NONE;
 
+    ActuatorCoordinates current_pos{
+        actuators[X_AXIS]->get_current_position(),
+        actuators[Y_AXIS]->get_current_position(),
+        actuators[Z_AXIS]->get_current_position()
+    };
+
     if( gcode->has_g) {
         switch( gcode->g ) {
             case 0:  motion_mode = SEEK;    break;
@@ -434,6 +447,17 @@ void Robot::on_gcode_received(void *argument)
                     current_wcs += gcode->subcode;
                     if(current_wcs >= MAX_WCS) current_wcs = MAX_WCS - 1;
                 }
+                break;
+
+            case 360:
+               while(fabs(current_pos[X_AXIS]) > 180)
+                {
+                    if(current_pos[X_AXIS] > 0)
+                        current_pos[X_AXIS] -= 360;
+                    else
+                        current_pos[X_AXIS] += 360;
+                }
+                reset_actuator_position(current_pos);
                 break;
 
             case 90: this->absolute_mode = true; this->e_absolute_mode = true; break;
@@ -857,7 +881,12 @@ void Robot::reset_axis_position(float x, float y, float z)
 
     // now set the actuator positions to match
     ActuatorCoordinates actuator_pos;
-    arm_solution->cartesian_to_actuator_extended(this->last_machine_position, actuator_pos, actuator_pos);
+    ActuatorCoordinates current_position{
+        actuators[X_AXIS]->get_current_position(),
+        actuators[Y_AXIS]->get_current_position(),
+        actuators[Z_AXIS]->get_current_position()
+    };
+    arm_solution->cartesian_to_actuator_extended(this->last_machine_position, actuator_pos, current_position);
     for (size_t i = X_AXIS; i <= Z_AXIS; i++)
         actuators[i]->change_last_milestone(actuator_pos[i]);
 }
@@ -904,7 +933,13 @@ void Robot::reset_position_from_current_actuator_position()
     // now reset actuator::last_milestone, NOTE this may lose a little precision as FK is not always entirely accurate.
     // NOTE This is required to sync the machine position with the actuator position, we do a somewhat redundant cartesian_to_actuator() call
     // to get everything in perfect sync.
-    arm_solution->cartesian_to_actuator_extended(last_machine_position, actuator_pos, actuator_pos);
+    ActuatorCoordinates current_pos{
+        actuators[X_AXIS]->get_current_position(),
+        actuators[Y_AXIS]->get_current_position(),
+        actuators[Z_AXIS]->get_current_position()
+    };
+
+    arm_solution->cartesian_to_actuator_extended(last_machine_position, actuator_pos, current_pos);
     for (size_t i = X_AXIS; i <= Z_AXIS; i++)
         actuators[i]->change_last_milestone(actuator_pos[i]);
 }
@@ -973,12 +1008,14 @@ bool Robot::append_milestone(const float target[], float rate_mm_s)
     // find actuator position given the machine position, use actual adjusted target
     ActuatorCoordinates current_position{
         actuators[X_AXIS]->get_current_position(),
-            actuators[Y_AXIS]->get_current_position(),
-            actuators[Z_AXIS]->get_current_position()
+        actuators[Y_AXIS]->get_current_position(),
+        actuators[Z_AXIS]->get_current_position()
     };
 
     ActuatorCoordinates actuator_pos;
     arm_solution->cartesian_to_actuator_extended( transformed_target, actuator_pos, current_position );
+
+    // if y < 10; e *= 0.90
 
 #if MAX_ROBOT_ACTUATORS > 3
     sos= 0;

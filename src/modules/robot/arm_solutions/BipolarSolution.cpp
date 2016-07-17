@@ -23,11 +23,8 @@ BipolarSolution::BipolarSolution(Config* config)
     raw_mode = false;
 }
 
-
-
 void BipolarSolution::cartesian_to_actuator( const float cartesian_mm[], ActuatorCoordinates &actuator_mm )
 {
-    cartesian_to_actuator_extended(cartesian_mm, actuator_mm, actuator_mm);
     THEKERNEL->streams->printf("ERROR!\n");
 }
 
@@ -70,19 +67,30 @@ void BipolarSolution::cartesian_to_actuator_extended( const float cartesian_mm[]
             THEKERNEL->streams->printf("ok ARM LARGE MOVE\n");
         }
 
-        if(fabs(theta1_deg - cur[ALPHA_STEPPER]) > 180)
+        auto old_theta1 = theta1_deg;
+        while(fabs(theta1_deg - cur[ALPHA_STEPPER]) > 180)
         {
             if((theta1_deg - cur[ALPHA_STEPPER]) > 0)
                 theta1_deg -= 360;
             else
                 theta1_deg += 360;
+            /*
+            if(cur[ALPHA_STEPPER] > 0)
+            {
+                cur[ALPHA_STEPPER] -= 360;
+            }
+            else
+            {
+                cur[ALPHA_STEPPER] += 360;
+            }
+            */
         }
-/*
+        
         if(fabs(theta1_deg - cur[ALPHA_STEPPER]) > 180)
         {
-            THEKERNEL->streams->printf("ok BED LARGE MOVE: (TO: %f) (FROM: %f) DISTANCE: %f\n", theta1_deg, fabs(theta1_deg - cur[ALPHA_STEPPER]));
+            THEKERNEL->streams->printf("ok BLME: OLD_TO: %f TO: %f FROM: %f DISTANCE: %f\n", old_theta1, theta1_deg, cur[ALPHA_STEPPER], fabs(theta1_deg - cur[ALPHA_STEPPER]));
         }
-*/
+
         actuator_mm[ALPHA_STEPPER] = theta1_deg;
         actuator_mm[BETA_STEPPER ] = theta2_deg;
         actuator_mm[GAMMA_STEPPER] = cartesian_mm[Z_AXIS];
