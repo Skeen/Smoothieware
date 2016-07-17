@@ -27,6 +27,7 @@ public:
     BipolarSolution(){};
     BipolarSolution(Config*);
     void cartesian_to_actuator( const float millimeters[], ActuatorCoordinates &steps ) override;
+    void cartesian_to_actuator_extended( const float millimeters[], ActuatorCoordinates &steps, ActuatorCoordinates& cur ) override;
     void actuator_to_cartesian( const ActuatorCoordinates &steps, float millimeters[] ) override;
 
     // Convert between degrees and radians

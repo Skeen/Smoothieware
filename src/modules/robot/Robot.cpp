@@ -227,7 +227,7 @@ void Robot::load_config()
     // initialise actuator positions to current cartesian position (X0 Y0 Z0)
     // so the first move can be correct if homing is not performed
     ActuatorCoordinates actuator_pos;
-    arm_solution->cartesian_to_actuator(last_milestone, actuator_pos);
+    arm_solution->cartesian_to_actuator_extended(last_milestone, actuator_pos, actuator_pos);
     for (size_t i = 0; i < n_motors; i++)
         actuators[i]->change_last_milestone(actuator_pos[i]);
 
@@ -857,7 +857,7 @@ void Robot::reset_axis_position(float x, float y, float z)
 
     // now set the actuator positions to match
     ActuatorCoordinates actuator_pos;
-    arm_solution->cartesian_to_actuator(this->last_machine_position, actuator_pos);
+    arm_solution->cartesian_to_actuator_extended(this->last_machine_position, actuator_pos, actuator_pos);
     for (size_t i = X_AXIS; i <= Z_AXIS; i++)
         actuators[i]->change_last_milestone(actuator_pos[i]);
 }
@@ -904,7 +904,7 @@ void Robot::reset_position_from_current_actuator_position()
     // now reset actuator::last_milestone, NOTE this may lose a little precision as FK is not always entirely accurate.
     // NOTE This is required to sync the machine position with the actuator position, we do a somewhat redundant cartesian_to_actuator() call
     // to get everything in perfect sync.
-    arm_solution->cartesian_to_actuator(last_machine_position, actuator_pos);
+    arm_solution->cartesian_to_actuator_extended(last_machine_position, actuator_pos, actuator_pos);
     for (size_t i = X_AXIS; i <= Z_AXIS; i++)
         actuators[i]->change_last_milestone(actuator_pos[i]);
 }
@@ -971,8 +971,14 @@ bool Robot::append_milestone(const float target[], float rate_mm_s)
     }
 
     // find actuator position given the machine position, use actual adjusted target
+    ActuatorCoordinates current_position{
+        actuators[X_AXIS]->get_current_position(),
+            actuators[Y_AXIS]->get_current_position(),
+            actuators[Z_AXIS]->get_current_position()
+    };
+
     ActuatorCoordinates actuator_pos;
-    arm_solution->cartesian_to_actuator( transformed_target, actuator_pos );
+    arm_solution->cartesian_to_actuator_extended( transformed_target, actuator_pos, current_position );
 
 #if MAX_ROBOT_ACTUATORS > 3
     sos= 0;

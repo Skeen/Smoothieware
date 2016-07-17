@@ -23,7 +23,15 @@ BipolarSolution::BipolarSolution(Config* config)
     raw_mode = false;
 }
 
+
+
 void BipolarSolution::cartesian_to_actuator( const float cartesian_mm[], ActuatorCoordinates &actuator_mm )
+{
+    cartesian_to_actuator_extended(cartesian_mm, actuator_mm, actuator_mm);
+    THEKERNEL->streams->printf("ERROR!\n");
+}
+
+void BipolarSolution::cartesian_to_actuator_extended( const float cartesian_mm[], ActuatorCoordinates &actuator_mm, ActuatorCoordinates& cur )
 {
     if(raw_mode)
     {
@@ -41,31 +49,40 @@ void BipolarSolution::cartesian_to_actuator( const float cartesian_mm[], Actuato
         auto theta2_deg = to_degrees(thetas.y);
 
         if(std::fpclassify(theta1_deg) != FP_NORMAL) {
-            THEKERNEL->streams->printf("WAT");
+            THEKERNEL->streams->printf("ok BED FP NOT NORMAL\n");
         }
-        if(std::fpclassify(to_degrees(thetas.y)) != FP_NORMAL) {
-            THEKERNEL->streams->printf("WAT");
+        if(std::fpclassify(theta2_deg) != FP_NORMAL) {
+            THEKERNEL->streams->printf("ok ARM FP NOT NORMAL\n");
         }
-        /*
-        if(theta1_deg < 1)
-        {
-            theta1_deg = 1;
-        }
-        if(theta2_deg < 1)
-        {
-            theta2_deg = 1;
-        }
-        */
 
-        /*
-        if(fabs(theta1_deg - actuator_mm[ALPHA_STEPPER]) > 180)
+        if(theta1_deg > 400 || theta1_deg < -400)
         {
-            if(theta1_deg > 0)
+            THEKERNEL->streams->printf("ok BED POSITION EXTREME\n");
+        }
+
+        if(theta2_deg > 400 || theta2_deg < -400)
+        {
+            THEKERNEL->streams->printf("ok ARM POSITION EXTREME\n");
+        }
+
+        if(fabs(theta2_deg - actuator_mm[BETA_STEPPER]) > 180)
+        {
+            THEKERNEL->streams->printf("ok ARM LARGE MOVE\n");
+        }
+
+        if(fabs(theta1_deg - cur[ALPHA_STEPPER]) > 180)
+        {
+            if((theta1_deg - cur[ALPHA_STEPPER]) > 0)
                 theta1_deg -= 360;
             else
                 theta1_deg += 360;
         }
-        */
+/*
+        if(fabs(theta1_deg - cur[ALPHA_STEPPER]) > 180)
+        {
+            THEKERNEL->streams->printf("ok BED LARGE MOVE: (TO: %f) (FROM: %f) DISTANCE: %f\n", theta1_deg, fabs(theta1_deg - cur[ALPHA_STEPPER]));
+        }
+*/
         actuator_mm[ALPHA_STEPPER] = theta1_deg;
         actuator_mm[BETA_STEPPER ] = theta2_deg;
         actuator_mm[GAMMA_STEPPER] = cartesian_mm[Z_AXIS];
