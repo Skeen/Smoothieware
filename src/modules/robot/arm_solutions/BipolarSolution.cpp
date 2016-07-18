@@ -46,25 +46,25 @@ void BipolarSolution::cartesian_to_actuator_extended( const float cartesian_mm[]
         auto theta2_deg = to_degrees(thetas.y);
 
         if(std::fpclassify(theta1_deg) != FP_NORMAL) {
-            THEKERNEL->streams->printf("ok BED FP NOT NORMAL\n");
+            THEKERNEL->streams->printf("ok BED FP NOT NORMAL: %f\n", theta1_deg);
         }
         if(std::fpclassify(theta2_deg) != FP_NORMAL) {
-            THEKERNEL->streams->printf("ok ARM FP NOT NORMAL\n");
+            THEKERNEL->streams->printf("ok ARM FP NOT NORMAL: %f\n", theta2_deg);
         }
 
         if(theta1_deg > 400 || theta1_deg < -400)
         {
-            THEKERNEL->streams->printf("ok BED POSITION EXTREME\n");
+            THEKERNEL->streams->printf("ok BED POSITION EXTREME: %f\n", theta1_deg);
         }
 
         if(theta2_deg > 400 || theta2_deg < -400)
         {
-            THEKERNEL->streams->printf("ok ARM POSITION EXTREME\n");
+            THEKERNEL->streams->printf("ok ARM POSITION EXTREME: %f\n", theta2_deg);
         }
 
-        if(fabs(theta2_deg - actuator_mm[BETA_STEPPER]) > 180)
+        if(theta2_deg < 0)
         {
-            THEKERNEL->streams->printf("ok ARM LARGE MOVE\n");
+            THEKERNEL->streams->printf("ok ARM POSITION NEGATIVE: %f\n", theta2_deg);
         }
 
         auto old_theta1 = theta1_deg;
@@ -88,7 +88,12 @@ void BipolarSolution::cartesian_to_actuator_extended( const float cartesian_mm[]
         
         if(fabs(theta1_deg - cur[ALPHA_STEPPER]) > 180)
         {
-            THEKERNEL->streams->printf("ok BLME: OLD_TO: %f TO: %f FROM: %f DISTANCE: %f\n", old_theta1, theta1_deg, cur[ALPHA_STEPPER], fabs(theta1_deg - cur[ALPHA_STEPPER]));
+            THEKERNEL->streams->printf("ok BLM: OLD_TO: %f TO: %f FROM: %f DISTANCE: %f\n", old_theta1, theta1_deg, cur[ALPHA_STEPPER], fabs(theta1_deg - cur[ALPHA_STEPPER]));
+        }
+
+        if(fabs(theta2_deg - cur[BETA_STEPPER]) > 180)
+        {
+            THEKERNEL->streams->printf("ok ALM: TO: %f FROM: %f DISTANCE: %f\n", theta2_deg, cur[BETA_STEPPER], fabs(theta2_deg - cur[BETA_STEPPER]));
         }
 
         actuator_mm[ALPHA_STEPPER] = theta1_deg;
