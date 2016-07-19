@@ -217,8 +217,10 @@ void SimpleShell::on_console_line_received( void *argument )
                 break;
 
             case 'X':
-                THEKERNEL->call_event(ON_HALT, (void *)1); // clears on_halt
-                new_message.stream->printf("[Caution: Unlocked]\nok\n");
+                if(THEKERNEL->is_halted()) {
+                    THEKERNEL->call_event(ON_HALT, (void *)1); // clears on_halt
+                    new_message.stream->printf("[Caution: Unlocked]\nok\n");
+                }
                 break;
 
             case '#':
@@ -1073,6 +1075,10 @@ void SimpleShell::test_command( string parameters, StreamOutput *stream)
             // delay but call on_idle
             safe_delay_us(delayus);
         }
+
+        // reset the position based on current actuator position
+        THEROBOT->reset_position_from_current_actuator_position();
+
         stream->printf("done\n");
 
     }else {

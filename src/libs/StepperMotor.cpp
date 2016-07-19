@@ -23,10 +23,13 @@ StepperMotor::StepperMotor(Pin &step, Pin &dir, Pin &en) : step_pin(step), dir_p
     last_milestone_steps = 0;
     last_milestone_mm    = 0.0F;
     current_position_steps= 0;
-    enable(false);
     moving= false;
     acceleration= NAN;
     selected= true;
+
+    enable(false);
+    unstep(); // initialize step pin
+    set_direction(false); // initialize dor pin
 
     this->register_for_event(ON_HALT);
     this->register_for_event(ON_ENABLE);
@@ -85,6 +88,8 @@ int32_t StepperMotor::steps_to_target(float target)
 }
 
 // Does a manual step pulse, used for direct encoder control of a stepper
+// NOTE this is experimental and may change and/or be reomved in the future, it is an unsupported feature.
+// use at your own risk
 void StepperMotor::manual_step(bool dir)
 {
     if(!is_enabled()) enable(true);
