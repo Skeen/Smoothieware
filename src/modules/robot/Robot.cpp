@@ -450,7 +450,7 @@ void Robot::on_gcode_received(void *argument)
                 break;
 
             case 360:
-               while(fabs(current_pos[X_AXIS]) > 180)
+                while(fabs(current_pos[X_AXIS]) > 180)
                 {
                     if(current_pos[X_AXIS] > 0)
                         current_pos[X_AXIS] -= 360;
@@ -1004,7 +1004,19 @@ bool Robot::append_milestone(const float target[], float rate_mm_s)
             }
         }
     }
-
+/*
+    // Try currentX instead
+    float currentX = actuators[X_AXIS]->get_current_position();
+    if(currentX > 400)
+    {
+        currentX -= 360;
+    }
+    else if(currentX < -400)
+    {
+        currentX += 360;
+    }
+    actuators[X_AXIS]->change_last_milestone(currentX);
+*/
     // find actuator position given the machine position, use actual adjusted target
     ActuatorCoordinates current_position{
         actuators[X_AXIS]->get_current_position(),
@@ -1016,6 +1028,13 @@ bool Robot::append_milestone(const float target[], float rate_mm_s)
     arm_solution->cartesian_to_actuator_extended( transformed_target, actuator_pos, current_position );
 
     // if y < 10; e *= 0.90
+    /*
+    if(actuator_pos[Y_AXIS] < 1) {
+        actuators[E_AXIS]->change_last_milestone(transformed_target[E_AXIS]);
+    }
+    */
+
+
 
 #if MAX_ROBOT_ACTUATORS > 3
     sos= 0;
