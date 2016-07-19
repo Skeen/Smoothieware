@@ -90,11 +90,12 @@ public:
     template<typename floating>
     Coord2D<floating> cartesian2bipolar(floating x, floating y)
     {
+        /*
         floating theta2 = 2 * asin( sqrt(x*x + y*y) / (2*arm_length) );
         floating theta1 = (M_PI-theta2)/2 - atan2(y,x);
 
         return Coord2D<floating>(theta1, theta2);
-        /*
+        */
         auto choord = cartesian2polar(x,y);
 
         float theta = choord.x;
@@ -102,8 +103,7 @@ public:
 
         float th1 = acos( r / (2* arm_length) ) - theta;
         float th2 = 2 * asin( r / (2* arm_length) );
-        return Coord2D(th1,th2);
-        */
+        return Coord2D<floating>(th1,th2);
     }
 
     bool set_optional(const arm_options_t& options) override;
