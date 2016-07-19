@@ -57,6 +57,37 @@ bool Planner::append_block( ActuatorCoordinates &actuator_pos, uint8_t n_motors,
 
     // Direction bits
     bool has_steps= false;
+    /*
+    {
+        int32_t HALF_CIRCLE_STEPS = THEROBOT->actuators[0]->steps_per_mm * 180;
+        int32_t steps = THEROBOT->actuators[0]->steps_to_target(actuator_pos[0]);
+        if(steps != 0) {
+            if(steps > HALF_CIRCLE_STEPS)
+            {
+                if(THEROBOT->actuators[0]->last_milestone_steps > 0)
+                {
+                    THEROBOT->actuators[0]->update_last_milestones(actuator_pos[0], -(HALF_CIRCLE_STEPS*2));
+                }
+                else
+                {
+                    THEROBOT->actuators[0]->update_last_milestones(actuator_pos[0], (HALF_CIRCLE_STEPS*2));
+                }
+            }
+            steps = THEROBOT->actuators[0]->steps_to_target(actuator_pos[0]);
+        }
+
+        // Update current position
+        if(steps != 0) {
+            THEROBOT->actuators[0]->update_last_milestones(actuator_pos[0], steps);
+            has_steps= true;
+        }
+
+        // find direction
+        block->direction_bits[0] = (steps < 0) ? 1 : 0;
+        // save actual steps in block
+        block->steps[0] = labs(steps);
+    }
+*/
     for (size_t i = 0; i < n_motors; i++) {
         int32_t steps = THEROBOT->actuators[i]->steps_to_target(actuator_pos[i]);
         // Update current position
