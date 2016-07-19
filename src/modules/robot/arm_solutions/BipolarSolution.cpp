@@ -38,33 +38,57 @@ void BipolarSolution::cartesian_to_actuator_extended( const float cartesian_mm[]
     }
     else
     {
+        if(fabs(cartesian_mm[X_AXIS]) < 0.05 && fabs(cartesian_mm[Y_AXIS]) < 0.05)
+        {
+            THEKERNEL->streams->printf("ok CENTER: (%f,%f)\n", cartesian_mm[X_AXIS], cartesian_mm[Y_AXIS]);
+        }
+        if(fabs(cartesian_mm[X_AXIS]) < 0.01 && fabs(cartesian_mm[Y_AXIS]) < 0.01)
+        {
+            THEKERNEL->streams->printf("ok CRITICAL CENTER: (%f,%f)\n", cartesian_mm[X_AXIS], cartesian_mm[Y_AXIS]);
+        }
+
         // Handle crossing 180degree barrier
         // https://github.com/unlimitedbacon/BipolarMarlin/commit/510602fa8ccf5816d4a16a956515c80dad9a8d80
-        auto thetas = cartesian2bipolar((long double) cartesian_mm[X_AXIS], (long double) cartesian_mm[Y_AXIS]);
+        auto thetas = cartesian2bipolar((double) cartesian_mm[X_AXIS], (double) cartesian_mm[Y_AXIS]);
 
         auto theta1_deg = to_degrees(thetas.x);
         auto theta2_deg = to_degrees(thetas.y);
 
         if(std::fpclassify(theta1_deg) != FP_NORMAL) {
             THEKERNEL->streams->printf("ok BED FP NOT NORMAL: %f\n", theta1_deg);
+            theta1_deg = cur[ALPHA_STEPPER];
         }
+
         if(std::fpclassify(theta2_deg) != FP_NORMAL) {
             THEKERNEL->streams->printf("ok ARM FP NOT NORMAL: %f\n", theta2_deg);
+            theta2_deg = cur[BETA_STEPPER];
         }
 
-        if(theta1_deg > 400 || theta1_deg < -400)
+        if(theta1_deg > 360 || theta1_deg < -360)
         {
-            THEKERNEL->streams->printf("ok BED POSITION EXTREME: %f\n", theta1_deg);
+            THEKERNEL->streams->printf("ok BED MOVE EXTREME: %f\n", theta1_deg);
         }
 
-        if(theta2_deg > 400 || theta2_deg < -400)
+        if(theta2_deg > 100)
         {
-            THEKERNEL->streams->printf("ok ARM POSITION EXTREME: %f\n", theta2_deg);
+            THEKERNEL->streams->printf("ok ARM MOVE EXTREME: %f\n", theta2_deg);
         }
 
         if(theta2_deg < 0)
         {
-            THEKERNEL->streams->printf("ok ARM POSITION NEGATIVE: %f\n", theta2_deg);
+            THEKERNEL->streams->printf("ok ARM MOVE NEGATIVE: %f\n", theta2_deg);
+        }
+
+/* // NOTE: Arm goes negative all the time
+        if(cur[BETA_STEPPER] < -3)
+        {
+            THEKERNEL->streams->printf("ok ARM POSITION NEGATIVE: %f\n", cur[BETA_STEPPER]);
+        }
+*/
+
+        if(cur[BETA_STEPPER] > 400 || cur[BETA_STEPPER] < -400)
+        {
+            THEKERNEL->streams->printf("ok ARM POSITION EXTREME: %f\n", cur[BETA_STEPPER]);
         }
 
         auto old_theta1 = theta1_deg;
@@ -74,18 +98,13 @@ void BipolarSolution::cartesian_to_actuator_extended( const float cartesian_mm[]
                 theta1_deg -= 360;
             else
                 theta1_deg += 360;
-            /*
-            if(cur[ALPHA_STEPPER] > 0)
-            {
-                cur[ALPHA_STEPPER] -= 360;
-            }
-            else
-            {
-                cur[ALPHA_STEPPER] += 360;
-            }
-            */
         }
-        
+
+        if(fabs(theta1_deg - cur[ALPHA_STEPPER]) > 90)
+        {
+            THEKERNEL->streams->printf("ok BSLM: (%f,%f) --> (%f,%f)\n", cartesian_mm[X_AXIS], cartesian_mm[Y_AXIS], theta1_deg, theta2_deg);
+        }
+
         if(fabs(theta1_deg - cur[ALPHA_STEPPER]) > 180)
         {
             THEKERNEL->streams->printf("ok BLM: OLD_TO: %f TO: %f FROM: %f DISTANCE: %f\n", old_theta1, theta1_deg, cur[ALPHA_STEPPER], fabs(theta1_deg - cur[ALPHA_STEPPER]));
@@ -112,7 +131,7 @@ void BipolarSolution::actuator_to_cartesian( const ActuatorCoordinates &actuator
     }
     else
     {
-        auto carts = bipolar2cartesian(to_radians((long double) actuator_mm[X_AXIS]), to_radians((long double) actuator_mm[Y_AXIS]));
+        auto carts = bipolar2cartesian(to_radians((double) actuator_mm[X_AXIS]), to_radians((double) actuator_mm[Y_AXIS]));
 
         cartesian_mm[ALPHA_STEPPER] = carts.x;
         cartesian_mm[BETA_STEPPER ] = carts.y;
