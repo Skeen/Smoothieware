@@ -99,12 +99,12 @@ void BipolarSolution::cartesian_to_actuator_extended( const float cartesian_mm[]
             else
                 theta1_deg += 360;
         }
-
+/*
         if(fabs(theta1_deg - cur[ALPHA_STEPPER]) > 90)
         {
             THEKERNEL->streams->printf("ok BSLM: (%f,%f) --> (%f,%f)\n", cartesian_mm[X_AXIS], cartesian_mm[Y_AXIS], theta1_deg, theta2_deg);
         }
-
+*/
         if(fabs(theta1_deg - cur[ALPHA_STEPPER]) > 180)
         {
             THEKERNEL->streams->printf("ok BLM: OLD_TO: %f TO: %f FROM: %f DISTANCE: %f\n", old_theta1, theta1_deg, cur[ALPHA_STEPPER], fabs(theta1_deg - cur[ALPHA_STEPPER]));
