@@ -32,6 +32,7 @@
 #include "ThreePointStrategy.h"
 //#include "ZGridStrategy.h"
 #include "DeltaGridStrategy.h"
+#include "AverageStrategy.h"
 
 #define enable_checksum          CHECKSUM("enable")
 #define probe_pin_checksum       CHECKSUM("probe_pin")
@@ -97,6 +98,12 @@ void ZProbe::config_load()
                 case three_point_leveling_strategy_checksum:
                     // NOTE this strategy is mutually exclusive with the delta calibration strategy
                     this->strategies.push_back(new ThreePointStrategy(this));
+                    found= true;
+                    break;
+
+                case average_leveling_strategy_checksum:
+                    // NOTE this strategy is mutually exclusive with the delta calibration strategy
+                    this->strategies.push_back(new AverageStrategy(this));
                     found= true;
                     break;
 

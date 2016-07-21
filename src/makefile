@@ -70,7 +70,7 @@ else
 export EXCLUDED_MODULES = $(EXCLUDE_MODULES)
 endif
 
-export EXCLUDE_MODULES = tools/drillingcycles tools/filamentdetector tools/laser tools/rotarydeltacalibration tools/scaracal tools/spindle tools/zprobe utils/motordrivercontrol utils/panel
+export EXCLUDE_MODULES = tools/drillingcycles tools/filamentdetector tools/laser tools/rotarydeltacalibration tools/scaracal tools/spindle utils/motordrivercontrol utils/panel
 
 # included modules
 # tools:
@@ -80,6 +80,7 @@ export EXCLUDE_MODULES = tools/drillingcycles tools/filamentdetector tools/laser
 #temperatureswitch
 #switch
 #toolmanager 
+#zprobe
 # utils:
 #configurator
 #currentcontrol

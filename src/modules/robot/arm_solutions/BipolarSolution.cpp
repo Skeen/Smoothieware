@@ -38,16 +38,15 @@ void BipolarSolution::cartesian_to_actuator_extended( const float cartesian_mm[]
     }
     else
     {
-        if(fabs(cartesian_mm[X_AXIS]) < 0.05 && fabs(cartesian_mm[Y_AXIS]) < 0.05)
-        {
-            THEKERNEL->streams->printf("ok CENTER: (%f,%f)\n", cartesian_mm[X_AXIS], cartesian_mm[Y_AXIS]);
-        }
         if(fabs(cartesian_mm[X_AXIS]) < 0.01 && fabs(cartesian_mm[Y_AXIS]) < 0.01)
         {
             THEKERNEL->streams->printf("ok CRITICAL CENTER: (%f,%f)\n", cartesian_mm[X_AXIS], cartesian_mm[Y_AXIS]);
         }
-
-        // Handle crossing 180degree barrier
+        else if(fabs(cartesian_mm[X_AXIS]) < 0.05 && fabs(cartesian_mm[Y_AXIS]) < 0.05)
+        {
+            THEKERNEL->streams->printf("ok CENTER: (%f,%f)\n", cartesian_mm[X_AXIS], cartesian_mm[Y_AXIS]);
+        }
+               // Handle crossing 180degree barrier
         // https://github.com/unlimitedbacon/BipolarMarlin/commit/510602fa8ccf5816d4a16a956515c80dad9a8d80
         auto thetas = cartesian2bipolar((double) cartesian_mm[X_AXIS], (double) cartesian_mm[Y_AXIS]);
 
