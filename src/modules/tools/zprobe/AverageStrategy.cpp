@@ -44,6 +44,7 @@
 #include "StreamOutputPool.h"
 #include "Gcode.h"
 #include "checksumm.h"
+#include "utils.h"
 #include "ConfigValue.h"
 #include "PublicDataRequest.h"
 #include "PublicData.h"
@@ -86,47 +87,39 @@ bool AverageStrategy::handleConfig()
     unsigned num_probe_points = atoi(points.c_str());
 
     // Setup vector size, and allocate nans
-    //probe_points.resize(num_probe_points);
-    probe_points.resize(8);
+    probe_points.resize(num_probe_points);
+    //probe_points.resize(8);
     for(unsigned int i = 0; i < probe_points.size(); ++i) 
     {
         probe_points[i] = std::make_tuple(NAN, NAN);
     }
  
     // Read in the points
-/*
     for(unsigned int i = 0; i < probe_points.size(); ++i) 
     {
-/*
-#define probe_point_3_checksum       CHECKSUM("point3")
-*/
-        /*
         std::string point_string = "point";
         point_string += number_to_string(i);
         // format is xxx,yyy for the probe points
-        std::string point = THEKERNEL->config->value(leveling_strategy_checksum, average_leveling_strategy_checksum, checksum(point_string.c_str(), 16, 0, 0, 0))->by_default("")->as_string();
+        std::string point = THEKERNEL->config->value(leveling_strategy_checksum, average_leveling_strategy_checksum, get_checksum(point_string.c_str()))->by_default("")->as_string();
         if(!point.empty())
         {
-            probe_points.push_back(parseXY(point.c_str()));
+            probe_points[i] = parseXY(point.c_str());
         }
         else
         {
             THEKERNEL->streams->printf("Configuration error; Missing zprobe point: %d", i);
         }
-        */
-    /*
-        probe_points.push_back(parseXY("0.0,0.0"));
     }
-    */
-    probe_points[0] = parseXY("0.0,65.0");
-    probe_points[1] = parseXY("45.0,65.0");
-    probe_points[2] = parseXY("90.0,65.0");
-    probe_points[3] = parseXY("135.0,65.0");
-    probe_points[4] = parseXY("180.0,65.0");
-    probe_points[5] = parseXY("225.0,65.0");
-    probe_points[6] = parseXY("270.0,65.0");
-    probe_points[7] = parseXY("315.0,65.0");
-
+    /*
+    probe_points[0] = parseXY("0.0,67.0");
+    probe_points[1] = parseXY("45.0,67.0");
+    probe_points[2] = parseXY("90.0,67.0");
+    probe_points[3] = parseXY("135.0,67.0");
+    probe_points[4] = parseXY("180.0,67.0");
+    probe_points[5] = parseXY("225.0,67.0");
+    probe_points[6] = parseXY("270.0,67.0");
+    probe_points[7] = parseXY("315.0,67.0");
+*/
     // Probe offsets xxx,yyy,zzz
     std::string po = THEKERNEL->config->value(leveling_strategy_checksum, average_leveling_strategy_checksum, probe_offsets_checksum)->by_default("0,0,0")->as_string();
     this->probe_offsets= parseXYZ(po.c_str());
@@ -176,12 +169,53 @@ bool AverageStrategy::handleGcode(Gcode *gcode)
             }
             return true;
 
+        } else if(gcode->m == 558) { // M558 - get probe points eg M558 P0 where P is 0,1,2
+            int idx = 0;
+            if(gcode->has_letter('P')) idx = gcode->get_value('P');
+ 
+            if(idx >= 0 && idx < (int) probe_points.size()) {
+                auto point = probe_points[idx];
+
+                gcode->stream->printf("%f, %f\n",
+                    std::get<X_AXIS>(point),
+                    std::get<Y_AXIS>(point));
+            }else{
+                 gcode->stream->printf("Only %d probe points configured!\n", probe_points.size());
+            }
+            return true;
+        } else if(gcode->m == 559) { // M559 - set number of probe points
+            int idx = -1;
+            if(gcode->has_letter('N')) idx = gcode->get_value('N');
+ 
+            if(idx >= 0) {
+                int size = probe_points.size();
+                probe_points.resize(idx);
+                for(unsigned int i = size; i < probe_points.size(); ++i) 
+                {
+                    probe_points[i] = std::make_tuple(NAN, NAN);
+                }
+            }else{
+                 gcode->stream->printf("Unable to configure number of probe points to %d\n", probe_points.size());
+            }
+            return true;
+
+        } else if(gcode->m == 560) { // M560 - get number of probe points
+            gcode->stream->printf("%d\n", probe_points.size());
+            return true;
+     
         } else if(gcode->m == 565) { // M565: Set Z probe offsets
             float x= 0, y= 0, z= 0;
             if(gcode->has_letter('X')) x = gcode->get_value('X');
             if(gcode->has_letter('Y')) y = gcode->get_value('Y');
             if(gcode->has_letter('Z')) z = gcode->get_value('Z');
             probe_offsets = std::make_tuple(x, y, z);
+            return true;
+        } else if(gcode->m == 566) { // M566: Get Z probe offsets
+            gcode->stream->printf("%f, %f, %f\n",
+                std::get<X_AXIS>(this->probe_offsets),
+                std::get<Y_AXIS>(this->probe_offsets),
+                std::get<Z_AXIS>(this->probe_offsets));
+          
             return true;
         }
     }

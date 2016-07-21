@@ -22,7 +22,7 @@ gamma_steps_per_mm                           3200           # Steps per mm for g
 planner_queue_size                           32               # DO NOT CHANGE THIS UNLESS YOU KNOW EXACTLY WHAT YOU ARE DOING
 acceleration                                 150             # Acceleration in mm/second/second.
 #z_acceleration                              500              # Acceleration for Z only moves in mm/s^2, 0 uses acceleration which is the default. DO NOT SET ON A DELTA
-junction_deviation                           0.01             # Similar to the old "max_jerk", in millimeters,
+junction_deviation                           0.1              # Similar to the old "max_jerk", in millimeters,
                                                               # see https://github.com/grbl/grbl/blob/master/planner.c
                                                               # and https://github.com/grbl/grbl/wiki/Configuring-Grbl-v0.8
                                                               # Lower values mean being more careful, higher values means being
@@ -194,11 +194,11 @@ zprobe.probe_height          9                  # how much above bed to start pr
 
 # associated with zprobe the leveling strategy to use
 leveling-strategy.average-leveling.enable         true        # a leveling strategy that probes three points to define a plane and keeps the Z parallel to that plane
-#leveling-strategy.average-leveling.probe_points   4
-#leveling-strategy.average-leveling.point0         0.0,0.0   # the first probe point (x,y) optional may be defined with M557
-#leveling-strategy.average-leveling.point1         90.0,0.0   # the first probe point (x,y) optional may be defined with M557
-#leveling-strategy.average-leveling.point2         180.0,0.0 # the second probe point (x,y)
-#leveling-strategy.average-leveling.point3         270.0,0.0   # the third probe point (x,y)
+leveling-strategy.average-leveling.probe_points   4
+leveling-strategy.average-leveling.point0         0.0,0.0   # the first probe point (x,y) optional may be defined with M557
+leveling-strategy.average-leveling.point1         90.0,0.0   # the first probe point (x,y) optional may be defined with M557
+leveling-strategy.average-leveling.point2         180.0,0.0 # the second probe point (x,y)
+leveling-strategy.average-leveling.point3         270.0,0.0   # the third probe point (x,y)
 leveling-strategy.average-leveling.probe_offsets  0,0,9.1       # the probe offsets from nozzle, must be x,y,z, default is no offset
 leveling-strategy.average-leveling.tolerance      0.3
 leveling-strategy.average-leveling.point_tolerance  0.5
