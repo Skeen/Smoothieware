@@ -110,16 +110,7 @@ bool AverageStrategy::handleConfig()
             THEKERNEL->streams->printf("Configuration error; Missing zprobe point: %d", i);
         }
     }
-    /*
-    probe_points[0] = parseXY("0.0,67.0");
-    probe_points[1] = parseXY("45.0,67.0");
-    probe_points[2] = parseXY("90.0,67.0");
-    probe_points[3] = parseXY("135.0,67.0");
-    probe_points[4] = parseXY("180.0,67.0");
-    probe_points[5] = parseXY("225.0,67.0");
-    probe_points[6] = parseXY("270.0,67.0");
-    probe_points[7] = parseXY("315.0,67.0");
-*/
+
     // Probe offsets xxx,yyy,zzz
     std::string po = THEKERNEL->config->value(leveling_strategy_checksum, average_leveling_strategy_checksum, probe_offsets_checksum)->by_default("0,0,0")->as_string();
     this->probe_offsets= parseXYZ(po.c_str());
