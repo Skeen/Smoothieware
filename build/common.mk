@@ -139,7 +139,7 @@ OBJECTS += $(OUTDIR)/configdefault.o
 DEPFILES = $(patsubst %.o,%.d,$(OBJECTS))
 
 # Linker script to be used.  Indicates what code should be placed where in memory.
-LSCRIPT=$(MBED_DIR)/$(DEVICE)/GCC_ARM/$(DEVICE).ld
+LSCRIPT?=$(MBED_DIR)/$(DEVICE)/GCC_ARM/$(DEVICE).ld
 
 # Location of external library and header dependencies.
 MBED_DIR = $(BUILD_DIR)/../mbed/drop

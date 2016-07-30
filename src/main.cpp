@@ -35,6 +35,7 @@
 #include "ConfigValue.h"
 #include "StepTicker.h"
 #include "SlowTicker.h"
+#include "Robot.h"
 
 // #include "libs/ChaNFSSD/SDFileSystem.h"
 #include "libs/nuts_bolts.h"
@@ -67,9 +68,14 @@
 
 
 // USB Stuff
+#ifndef NO_SDCARD
 SDCard sd  __attribute__ ((section ("AHBSRAM0"))) (P0_9, P0_8, P0_7, P0_6);      // this selects SPI1 as the sdcard as it is on Smoothieboard
 //SDCard sd(P0_18, P0_17, P0_15, P0_16);  // this selects SPI0 as the sdcard
 //SDCard sd(P0_18, P0_17, P0_15, P2_8);  // this selects SPI0 as the sdcard witrh a different sd select
+#else
+    // No SDCARD, NO MSD
+    #define DISABLEMSD
+#endif
 
 USB u __attribute__ ((section ("AHBSRAM0")));
 USBSerial usbserial __attribute__ ((section ("AHBSRAM0"))) (&u);
@@ -79,7 +85,9 @@ USBMSD msc __attribute__ ((section ("AHBSRAM0"))) (&u, &sd);
 USBMSD *msc= NULL;
 #endif
 
+#ifndef NO_SDCARD
 SDFAT mounter __attribute__ ((section ("AHBSRAM0"))) ("sd", &sd);
+#endif
 
 GPIO leds[5] = {
     GPIO(P1_18),
@@ -89,11 +97,6 @@ GPIO leds[5] = {
     GPIO(P4_28)
 };
 
-// debug pins, only used if defined in src/makefile
-#ifdef STEPTICKER_DEBUG_PIN
-GPIO stepticker_debug_pin(STEPTICKER_DEBUG_PIN);
-#endif
-
 void init() {
 
     // Default pins to low status
@@ -101,11 +104,6 @@ void init() {
         leds[i].output();
         leds[i]= 0;
     }
-
-#ifdef STEPTICKER_DEBUG_PIN
-    stepticker_debug_pin.output();
-    stepticker_debug_pin= 0;
-#endif
 
     Kernel* kernel = new Kernel();
 
@@ -116,13 +114,20 @@ void init() {
     kernel->streams->printf("  CNC Build\r\n");
 #endif
 
-    bool sdok= (sd.disk_initialize() == 0);
-    if(!sdok) kernel->streams->printf("SDCard failed to initialize\r\n");
+    #ifndef NO_SDCARD
+        bool sdok= (sd.disk_initialize() == 0);
+        if(!sdok) kernel->streams->printf("SDCard failed to initialize\r\n");
+    #else
+        bool sdok = false;
+        kernel->streams->printf("SDCARD is disabled\r\n");
+    #endif
 
     #ifdef NONETWORK
         kernel->streams->printf("NETWORK is disabled\r\n");
     #endif
 
+// TODO: Clean this up
+#ifndef NO_SDCARD
 #ifdef DISABLEMSD
     // attempt to be able to disable msd in config
     if(sdok && !kernel->config->value( disable_msd_checksum )->by_default(false)->as_bool()){
@@ -136,7 +141,10 @@ void init() {
         kernel->streams->printf("MSD is disabled\r\n");
     }
 #endif
-
+#else
+    msc= NULL;
+    kernel->streams->printf("MSD is disabled\r\n");
+#endif
 
     // Create and add main modules
     kernel->add_module( new(AHB0) Player() );
@@ -144,10 +152,12 @@ void init() {
     kernel->add_module( new(AHB0) CurrentControl() );
     kernel->add_module( new(AHB0) KillButton() );
     kernel->add_module( new(AHB0) PlayLed() );
-    kernel->add_module( new(AHB0) Endstops() );
-
 
     // these modules can be completely disabled in the Makefile by adding to EXCLUDE_MODULES
+    #ifndef NO_TOOLS_ENDSTOPS
+    kernel->add_module( new(AHB0) Endstops() );
+    #endif
+
     #ifndef NO_TOOLS_SWITCH
     SwitchPool *sp= new SwitchPool();
     sp->load_tools();
@@ -166,10 +176,10 @@ void init() {
     delete tp;
     #endif
     #ifndef NO_TOOLS_LASER
-    kernel->add_module( new Laser() );
+//    kernel->add_module( new Laser() );
     #endif
     #ifndef NO_TOOLS_SPINDLE
-    kernel->add_module( new Spindle() );
+    kernel->add_module( new(AHB0) Spindle() );
     #endif
     #ifndef NO_UTILS_PANEL
     kernel->add_module( new(AHB0) Panel() );
@@ -181,20 +191,20 @@ void init() {
     kernel->add_module( new(AHB0) SCARAcal() );
     #endif
     #ifndef NO_TOOLS_ROTARYDELTACALIBRATION
-    kernel->add_module( new RotaryDeltaCalibration() );
+    kernel->add_module( new(AHB0) RotaryDeltaCalibration() );
     #endif
     #ifndef NONETWORK
     kernel->add_module( new Network() );
     #endif
     #ifndef NO_TOOLS_TEMPERATURESWITCH
     // Must be loaded after TemperatureControl
-    kernel->add_module( new TemperatureSwitch() );
+    kernel->add_module( new(AHB0) TemperatureSwitch() );
     #endif
     #ifndef NO_TOOLS_DRILLINGCYCLES
-    kernel->add_module( new Drillingcycles() );
+    kernel->add_module( new(AHB0) Drillingcycles() );
     #endif
     #ifndef NO_TOOLS_FILAMENTDETECTOR
-    kernel->add_module( new FilamentDetector() );
+    kernel->add_module( new(AHB0) FilamentDetector() );
     #endif
     #ifndef NO_UTILS_MOTORDRIVERCONTROL
     kernel->add_module( new MotorDriverControl(0) );
@@ -263,6 +273,7 @@ void init() {
     }
 
     // start the timers and interrupts
+    THEKERNEL->conveyor->start(THEROBOT->get_number_registered_motors());
     THEKERNEL->step_ticker->start();
     THEKERNEL->slow_ticker->start();
 }

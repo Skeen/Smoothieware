@@ -1,6 +1,6 @@
 PROJECT=main
 BUILD_DIR=../build
-DEVICES=lpc1768
+DEVICES?=lpc1768
 
 # BUILD_TYPE can be set to the following values:
 #  Checked - Optimizations enabled with MRI debug monitor support. (Recommended Type)
@@ -77,7 +77,7 @@ endif
 include $(BUILD_DIR)/build.mk
 
 CONSOLE?=/dev/arduino
-BAUD?=1000000
+BAUD?=9600
 
 .PHONY: debug-store flash upload debug console dfu
 
