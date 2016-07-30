@@ -84,8 +84,11 @@ BAUD?=9600
 debug-store: ../LPC1768/$(PROJECT).elf
 	cp ../LPC1768/$(PROJECT).elf ../LPC1768/$(PROJECT)_lastupload.elf
 
-flash: ../LPC1768/$(PROJECT).hex debug-store
-	lpc21isp $< $(CONSOLE) 115200 12000
+../LPC1768/$(PROJECT)-combined.hex: ../LPC1768/$(PROJECT).hex 
+	srec_cat ../bootloader/DFU-Bootloader.hex -Intel $< -Intel -out ../LPC1768/main-combined.hex -Intel
+
+flash: ../LPC1768/$(PROJECT)-combined.hex debug-store
+	lpc21isp -wipe $< $(CONSOLE) 115200 12000
 
 dfu: ../LPC1768/$(PROJECT).bin
 	dfu-util -D $< -R
