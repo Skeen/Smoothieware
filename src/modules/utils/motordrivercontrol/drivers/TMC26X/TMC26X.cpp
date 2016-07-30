@@ -37,7 +37,7 @@
 #include "ConfigValue.h"
 #include "Config.h"
 #include "checksumm.h"
-
+#include "StepTicker.h"
 
 #define motor_driver_control_checksum  CHECKSUM("motor_driver_control")
 #define sense_resistor_checksum        CHECKSUM("sense_resistor")
@@ -157,7 +157,7 @@
 /*
  * Constructor
  */
-TMC26X::TMC26X(std::function<int(uint8_t *b, int cnt, uint8_t *r)> spi) : spi(spi)
+TMC26X::TMC26X(std::function<int(uint8_t *b, int cnt, uint8_t *r)> spi, char d) : spi(spi), designator(d)
 {
     //we are not started yet
     started = false;
@@ -863,7 +863,7 @@ bool TMC26X::isCurrentScalingHalfed()
 void TMC26X::dumpStatus(StreamOutput *stream, bool readable)
 {
     if (readable) {
-        stream->printf("Chip type TMC26X\n");
+        stream->printf("designator %c, Chip type TMC26X\n", designator);
 
         check_error_status_bits(stream);
 
@@ -896,15 +896,15 @@ void TMC26X::dumpStatus(StreamOutput *stream, bool readable)
 
     } else {
         // TODO hardcoded for X need to select ABC as needed
-        bool moving = THEKERNEL->robot->actuators[0]->is_moving();
+        bool moving = THEROBOT->actuators[0]->is_moving();
         // dump out in the format that the processing script needs
         if (moving) {
-            stream->printf("#sg%d,p%lu,k%u,r,", getCurrentStallGuardReading(), THEKERNEL->robot->actuators[0]->get_stepped(), getCoolstepCurrent());
+            stream->printf("#sg%d,p%lu,k%u,r,", getCurrentStallGuardReading(), THEROBOT->actuators[0]->get_current_step(), getCoolstepCurrent());
         } else {
             readStatus(TMC26X_READOUT_POSITION); // get the status bits
             stream->printf("#s,");
         }
-        stream->printf("d%d,", THEKERNEL->robot->actuators[0]->which_direction() ? 1 : -1);
+        stream->printf("d%d,", THEROBOT->actuators[0]->which_direction() ? 1 : -1);
         stream->printf("c%u,m%d,", getCurrent(), getMicrosteps());
         // stream->printf('S');
         // stream->printf(tmc26XStepper.getSpeed(), DEC);
@@ -966,14 +966,14 @@ bool TMC26X::check_error_status_bits(StreamOutput *stream)
     readStatus(TMC26X_READOUT_POSITION); // get the status bits
 
     if (this->getOverTemperature()&TMC26X_OVERTEMPERATURE_PREWARING) {
-        if(!error_reported.test(0)) stream->printf("WARNING: Overtemperature Prewarning!\n");
+        if(!error_reported.test(0)) stream->printf("%c - WARNING: Overtemperature Prewarning!\n", designator);
         error_reported.set(0);
     }else{
         error_reported.reset(0);
     }
 
     if (this->getOverTemperature()&TMC26X_OVERTEMPERATURE_SHUTDOWN) {
-        if(!error_reported.test(1)) stream->printf("ERROR: Overtemperature Shutdown!\n");
+        if(!error_reported.test(1)) stream->printf("%c - ERROR: Overtemperature Shutdown!\n", designator);
         error=true;
         error_reported.set(1);
     }else{
@@ -981,7 +981,7 @@ bool TMC26X::check_error_status_bits(StreamOutput *stream)
     }
 
     if (this->isShortToGroundA()) {
-        if(!error_reported.test(2)) stream->printf("ERROR: SHORT to ground on channel A!\n");
+        if(!error_reported.test(2)) stream->printf("%c - ERROR: SHORT to ground on channel A!\n", designator);
         error=true;
         error_reported.set(2);
     }else{
@@ -989,7 +989,7 @@ bool TMC26X::check_error_status_bits(StreamOutput *stream)
     }
 
     if (this->isShortToGroundB()) {
-        if(!error_reported.test(3)) stream->printf("ERROR: SHORT to ground on channel B!\n");
+        if(!error_reported.test(3)) stream->printf("%c - ERROR: SHORT to ground on channel B!\n", designator);
         error=true;
         error_reported.set(3);
     }else{
@@ -998,7 +998,7 @@ bool TMC26X::check_error_status_bits(StreamOutput *stream)
 
     // these seem to be triggered when moving so ignore them for now
     if (this->isOpenLoadA()) {
-        if(!error_reported.test(4)) stream->printf("ERROR: Channel A seems to be unconnected!\n");
+        if(!error_reported.test(4)) stream->printf("%c - ERROR: Channel A seems to be unconnected!\n", designator);
         error=true;
         error_reported.set(4);
     }else{
@@ -1006,7 +1006,7 @@ bool TMC26X::check_error_status_bits(StreamOutput *stream)
     }
 
     if (this->isOpenLoadB()) {
-        if(!error_reported.test(5)) stream->printf("ERROR: Channel B seems to be unconnected!\n");
+        if(!error_reported.test(5)) stream->printf("%c - ERROR: Channel B seems to be unconnected!\n", designator);
         error=true;
         error_reported.set(5);
     }else{
